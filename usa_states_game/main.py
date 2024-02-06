@@ -2,10 +2,10 @@ import turtle
 import pandas as pd
 
 
-IMAGE_PATH = "./blank_states_img.gif"
+IMAGE_PATH = "./usa_states_game/blank_states_img.gif"
 
 
-data = pd.read_csv("./50_states.csv")
+data = pd.read_csv("./usa_states_game/50_states.csv")
 all_states = data["state"].tolist()
 
 screen = turtle.Screen()
@@ -30,13 +30,10 @@ while len(guessed_states) <= 50:
                                     prompt="What's another state's name?").title()
 
     if answer_state == "Exit":
-        missing_states = []
-        for state in all_states:
-            if state not in guessed_states:
-                missing_states.append(state)
+        missing_states = [state for state in all_states if state not in guessed_states]
 
         new_data = pd.DataFrame(missing_states)
-        new_data.to_csv("./states_to_learn.csv")
+        new_data.to_csv("./usa_states_game/states_to_learn.csv")
         break
 
     if answer_state in all_states:
