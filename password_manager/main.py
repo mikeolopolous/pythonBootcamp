@@ -1,20 +1,28 @@
 from tkinter import *
+from tkinter import messagebox
 
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
-def add_password():
+def save():
     value_website = website.get()
     value_username = username.get()
     value_password = password.get()
 
-    with open("data.txt", "a") as file:
-        file.write(f"{value_website} | {value_username} | {value_password}\n")
+    if value_website == "" or value_username == "":
+        messagebox.showwarning(title="Oops", message="Please do not leave any fields empty!")
+    else:
+        is_ok = messagebox.askokcancel(title=value_website,
+                                       message=f"Please confirm\nUsername: {value_username}\nPassword: {value_password}")
 
-    website.set("")
-    username.set("email@email.com")
-    password.set("")
+        if is_ok:
+            with open("data.txt", "a") as file:
+                file.write(f"{value_website} | {value_username} | {value_password}\n")
+
+            website.set("")
+            username.set("email@email.com")
+            password.set("")
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -52,7 +60,7 @@ password_entry.grid(row=3, column=1)
 generate_button = Button(text="Generate Password", width=11, highlightbackground="white")
 generate_button.grid(row=3, column=2)
 
-add_button = Button(text="Add", width=32, highlightbackground="white", command=add_password)
+add_button = Button(text="Add", width=32, highlightbackground="white", command=save)
 add_button.grid(row=4, column=1, columnspan=2)
 
 window.mainloop()
