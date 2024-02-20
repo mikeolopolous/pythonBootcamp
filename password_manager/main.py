@@ -1,4 +1,5 @@
 import pyperclip
+import json
 from tkinter import *
 from tkinter import messagebox
 from random import choice, randint, shuffle
@@ -31,21 +32,58 @@ def save():
     value_username = username.get()
     value_password = password.get()
 
+    new_data = {
+        value_website: {
+            "username": value_username,
+            "password": value_password
+        }
+    }
+
     if value_website == "" or value_username == "":
         messagebox.showwarning(title="Oops", message="Please do not leave any fields empty!")
     else:
-        is_ok = messagebox.askokcancel(
-            title=value_website,
-            message=f"Please confirm\nUsername: {value_username}\nPassword: {value_password}"
-        )
+        try:
+            with open("data.json", "r") as file:
+                data = json.load(file)
 
-        if is_ok:
-            with open("data.txt", "a") as file:
-                file.write(f"{value_website} | {value_username} | {value_password}\n")
+        except FileNotFoundError:
+            with open("data.json", "w") as file:
+                json.dump(new_data, file, indent=4)
 
+        else:
+            data.update(new_data)
+            with open("data.json", "w") as file:
+                json.dump(data, file, indent=4)
+
+        finally:
             website.set("")
             username.set("email@email.com")
             password.set("")
+
+
+# ------------------------- SEARCH PASSWORD --------------------------- #
+def find_password():
+    value_website = website.get()
+
+    if value_website != "":
+        try:
+            with open("data.json", "r") as file:
+                data = json.load(file)
+
+        except FileNotFoundError:
+            messagebox.showwarning(title="Error", message="No data file found!")
+
+        else:
+            if value_website in data:
+                messagebox.showinfo(
+                    title=value_website,
+                    message=f"Usuario: {data[value_website]["username"]}\nPassword: {data[value_website]["password"]}"
+                )
+            else:
+                messagebox.showinfo(title="Error", message=f"No details for {value_website} exists")
+
+    else:
+        messagebox.showwarning(title="Error", message="Please enter a website")
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -62,9 +100,12 @@ website_label = Label(text="Website: ", bg="white", fg="black")
 website_label.grid(row=1, column=0)
 
 website = StringVar(value="")
-website_entry = Entry(width=35, bg="white", fg="black", highlightthickness=0, textvariable=website)
+website_entry = Entry(width=19, bg="white", fg="black", highlightthickness=0, textvariable=website)
 website_entry.focus()
-website_entry.grid(row=1, column=1, columnspan=2)
+website_entry.grid(row=1, column=1)
+
+search_button = Button(text="Search", width=11, highlightbackground="white", command=find_password)
+search_button.grid(row=1, column=2)
 
 username_label = Label(text="Email/Username: ", bg="white", fg="black")
 username_label.grid(row=2, column=0)
